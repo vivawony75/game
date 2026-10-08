@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>초원의 제왕 사자: 야생 사냥 어드벤처 🦁</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for Cute and Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="appContainer">
+        <!-- TOP HUD -->
+        <header id="topHUD">
+            <div class="hud-left">
+                <div class="stage-tag" id="stageBadge">STAGE 1 / 10</div>
+                <div class="stage-title-wrap">
+                    <h2 id="stageTitle">1단계: 아기 토끼 동산</h2>
+                    <span class="target-sub" id="targetAnimalName">🐰 아기 토끼</span>
+                </div>
+            </div>
+
+            <!-- Timer Block -->
+            <div class="hud-center">
+                <div class="timer-box">
+                    <span class="timer-label">⏱️ 제한 시간</span>
+                    <span class="timer-value" id="timerDisplay">1:00</span>
+                </div>
+                <div class="timer-bar-wrapper">
+                    <div class="timer-bar-fill" id="timerProgress"></div>
+                </div>
+            </div>
+
+            <div class="hud-right">
+                <div class="prey-counter-box">
+                    <span class="counter-label">사냥 목표 (3마리)</span>
+                    <div class="prey-icons" id="preyCounter">⚪ ⚪ ⚪ <span>(0/3)</span></div>
+                </div>
+                <button id="soundBtn" class="hud-btn" title="소리 켜기/끄기">🔊 소리 켜짐</button>
+            </div>
+        </header>
+
+        <!-- MAIN GAME VIEW AREA -->
+        <main id="gameContainer">
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- Live Target Animal Emotion Radar Widget (귀여운 동물 감정 돋보기) -->
+            <aside id="radarCard" class="glass-widget">
+                <div class="radar-header">
+                    <span class="radar-tag">🔍 근접 동물 표정</span>
+                    <span id="radarDist" class="radar-dist">거리: 250m</span>
+                </div>
+                <div class="radar-body">
+                    <div class="radar-avatar" id="radarEmoji">🐰</div>
+                    <div class="radar-info">
+                        <div id="radarMood" class="radar-mood relaxed">🌿 평화롭게 풀 뜯는 중</div>
+                        <div id="radarQuote" class="radar-quote">"풀 냠냠~ 맛있다! 🌿"</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Virtual Joystick Elements for Mobile/Touch -->
+            <div id="joystickBase" class="joystick-base">
+                <div id="joystickHandle" class="joystick-handle"></div>
+            </div>
+
+            <!-- Action Buttons Floating on Screen -->
+            <div id="controlsOverlay">
+                <div class="key-guide">
+                    <span>이동: <b>방향키</b> / <b>W A S D</b> / <b>마우스 드래그</b></span>
+                    <span>질주: <b>스페이스바</b></span>
+                </div>
+                <button id="dashBtn" class="dash-action-btn">
+                    <span class="dash-icon">🦁💨</span>
+                    <div class="dash-text">
+                        <strong>포효 대시!</strong>
+                        <small>Space Bar</small>
+                    </div>
+                    <div class="dash-cd-overlay" id="dashCooldownBar"></div>
+                </button>
+            </div>
+        </main>
+
+        <!-- MODAL: START SCREEN -->
+        <div id="startModal" class="modal-backdrop">
+            <div class="modal-card">
+                <div class="modal-badge">초원 사냥 어드벤처</div>
+                <h1 class="modal-title">초원의 제왕 사자 🦁</h1>
+                <p class="modal-subtitle">귀여운 초원 동물들을 사냥하여 최고의 사자가 되어보세요!</p>
+
+                <div class="guide-grid">
+                    <div class="guide-item">
+                        <span class="g-icon">🗺️</span>
+                        <div>
+                            <h4>총 10단계 구성</h4>
+                            <p>토끼, 가젤, 얼룩말, 혹멧돼지, 타조, 물소, 전설의 황금 가젤까지!</p>
+                        </div>
+                    </div>
+                    <div class="guide-item">
+                        <span class="g-icon">🍗</span>
+                        <div>
+                            <h4>단계당 3마리 사냥</h4>
+                            <p>각 단계마다 3마리를 잡아야 다음 단계로 이동합니다.</p>
+                        </div>
+                    </div>
+                    <div class="guide-item">
+                        <span class="g-icon">⏱️</span>
+                        <div>
+                            <h4>제한 시간 1분 (60초)</h4>
+                            <p>시간 내에 못 잡으면 사자가 <b>배고파서 주저앉게 됩니다!</b></p>
+                        </div>
+                    </div>
+                    <div class="guide-item">
+                        <span class="g-icon">😱</span>
+                        <div>
+                            <h4>동물들의 귀여운 표정</h4>
+                            <p>사자가 다가갈수록 여유 ➡️ 놀람 ➡️ 기겁하며 전속력 질주!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="startBtn" class="modal-primary-btn">초원으로 출동하기! 🐾</button>
+            </div>
+        </div>
+
+        <!-- MODAL: STAGE CLEAR -->
+        <div id="stageClearModal" class="modal-backdrop hidden">
+            <div class="modal-card stage-clear-card">
+                <div class="clear-emoji">🍖✨🦁✨🍖</div>
+                <h2 id="clearStageTitle" class="modal-title success">1단계 클리어!</h2>
+                <p id="clearStageDesc" class="modal-desc">사자가 든든하게 배를 채웠습니다! 다음 단계의 사냥감이 기다립니다.</p>
+                <button id="nextStageBtn" class="modal-primary-btn">다음 단계로! 🐾</button>
+            </div>
+        </div>
+
+        <!-- MODAL: HUNGER COLLAPSE (배고파서 주저앉음 - 재도전 or 끝내기) -->
+        <div id="starveModal" class="modal-backdrop hidden">
+            <div class="modal-card starve-card">
+                <div class="starve-emoji">😭🦴🦁💧</div>
+                <h2 id="starveStageTitle" class="modal-title danger">배고파서 주저앉았습니다...</h2>
+                <p class="modal-desc">
+                    제한 시간 1분이 지나 사자의 기운이 쏙 빠져버렸습니다!<br>
+                    배에서 꼬르륵 소리가 나며 힘없이 털썩 쓰러졌습니다.
+                </p>
+                <div class="starve-choice-box">
+                    <p class="choice-prompt">사자를 일으켜 세워 다시 도전하시겠습니까?</p>
+                    <div class="btn-group">
+                        <button id="retryBtn" class="modal-primary-btn retry-btn">🔄 이 단계 다시 도전하기</button>
+                        <button id="giveupBtn" class="modal-secondary-btn">🚪 끝내기 / 처음부터</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: FINAL VICTORY (10단계 올 클리어!) -->
+        <div id="victoryModal" class="modal-backdrop hidden">
+            <div class="modal-card victory-card">
+                <div class="victory-emoji">👑🦁🎊✨🍗</div>
+                <h1 class="modal-title victory-title">초원의 위대한 제왕 탄생!</h1>
+                <p class="modal-desc">
+                    축하합니다! 10단계의 모든 전설적인 사냥에 성공하였습니다!<br>
+                    초원의 모든 동물들이 당신의 민첩함과 용맹함에 감탄합니다!
+                </p>
+                <button id="playAgainBtn" class="modal-primary-btn">처음부터 다시 즐기기 🏆</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
